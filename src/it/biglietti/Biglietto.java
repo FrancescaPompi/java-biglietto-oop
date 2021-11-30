@@ -3,21 +3,34 @@ package it.biglietti;
 //GRUPPO 5
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class Biglietto {
 	// Variabili
 		private int km;
 		private int eta;
+		private LocalDate data;
+		private boolean flessibile; 
 
 		// Costanti
 		private final BigDecimal costoKm = new BigDecimal("0.21");
 		private final BigDecimal scontoOver = new BigDecimal("0.6");
 		private final BigDecimal scontoUnder = new BigDecimal("0.8");
+		private final int durataNormale = 30;
+		private final int durataFlessibile = 90;
 
 		// Costruttore
-		public Biglietto(int km, int eta) {
+		public Biglietto(int km, int eta, boolean flessibile) throws Exception {
+			if(!isValidKm(km)) {
+				throw new Exception("km non valido.");
+			}
+			if(!isValidEta(eta)) {
+				throw new Exception("età non valida");
+			}
 			this.km = km;
 			this.eta = eta;
+			this.flessibile = flessibile;
+			this.data = null;
 		}
 
 		// Get and set
@@ -39,19 +52,19 @@ public class Biglietto {
 		}
 
 		// Metodi
-		public static boolean isValidKm(int km) {
+		boolean isValidKm(int km) {
 			boolean valid = false;
 			if (km > 0) {
 				valid = true;
-			} else System.out.println("il valore deve essere positivo.");
+			}
 			return valid;
 		}
 
-		public static boolean isValidEta(int eta) {
+		boolean isValidEta(int eta) {
 			boolean valid = false;
 			if (eta >= 0 && eta < 120) {
 				valid = true;
-			} else System.out.println("l'eta deve essere compresea tra 0 e 120.");
+			}
 			return valid;
 		}
 
@@ -67,7 +80,21 @@ public class Biglietto {
 
 		public BigDecimal calcolaPrezzo() {
 			BigDecimal x = new BigDecimal(km);
+			BigDecimal y = new BigDecimal(1.1);
 			x = x.multiply(costoKm);
-			return x.multiply(calcolaSconto());
+			if(flessibile == false) {
+				return x.multiply(calcolaSconto());
+			} else {
+				return x.multiply(calcolaSconto()).multiply(y);
+			}
+		}
+		
+		public LocalDate calcolaDataScadenza() {
+			if(flessibile == false) {
+				return data.plusDays(durataNormale);
+			} else {
+				return data.plusDays(durataFlessibile);
+			}
+			
 		}
 }
